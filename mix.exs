@@ -21,8 +21,10 @@ defmodule Meliex.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:hackney, "~> 1.18"},
+      {:jason, ">= 1.3.0"},
+      {:tesla, "~> 1.4"},
+      {:timex, "~> 3.7.6"}
     ]
   end
 end
