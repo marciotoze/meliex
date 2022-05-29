@@ -1,6 +1,8 @@
 defmodule Meliex.Resources.Item do
   alias Meliex.Client
 
+  @limit 50
+
   def find(ids, token) when is_list(ids), do: find(Enum.join(ids, ","), token)
 
   def find(ids, token) when is_binary(ids) do
@@ -11,39 +13,27 @@ defmodule Meliex.Resources.Item do
     Client.get("/users/#{user_id}/items/search", params, token: token)
   end
 
-  def scan(user_id, params \\ %{}, token) do
-    params =
-      Map.merge(
-        %{
-          search_type: "scan",
-          limit: 100
-        },
-        params
-      )
+  def all_by_user(user_id, token) do
+    tasks =
+      Enum.map(0..9, fn n ->
+        Task.async(fn -> get_user_products_by_page(user_id, n, token) end)
+      end)
 
-    Client.get("/users/#{user_id}/items/search", params, token: token)
+    tasks
+    |> Task.await_many()
+    |> List.flatten()
   end
 
-  def all_by_user(user_id, token) do
-    {:ok, %{body: %{"results" => results, "scroll_id" => scroll_id}}} = scan(user_id, %{}, token)
+  def get_user_products_by_page(user_id, page, token) do
+    params = %{offset: page * @limit, limit: @limit}
 
-    item_ids =
-      Stream.iterate(%{results: results, scroll_id: scroll_id}, fn %{scroll_id: scroll_id} ->
-        {:ok, %{body: %{"results" => current_results, "scroll_id" => scroll_id}}} =
-          scan(user_id, %{scroll_id: scroll_id}, token)
+    {:ok, %{body: %{"results" => results}}} =
+      Client.get(
+        "https://api.mercadolibre.com/sites/MLB/search?seller_id=#{user_id}",
+        params,
+        token: token
+      )
 
-        %{
-          results: current_results,
-          scroll_id: scroll_id
-        }
-      end)
-      |> Enum.take_while(fn %{results: results} ->
-        results != []
-      end)
-      |> Enum.reduce([], fn %{results: results}, acc ->
-        acc ++ results
-      end)
-
-    {:ok, item_ids}
+    Enum.map(results, & &1["id"])
   end
 end
