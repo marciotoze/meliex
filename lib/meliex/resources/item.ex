@@ -13,10 +13,10 @@ defmodule Meliex.Resources.Item do
     Client.get("/users/#{user_id}/items/search", params, token: token)
   end
 
-  def all_by_user(user_id, token) do
+  def all_by_user(nickname, token) do
     tasks =
       Enum.map(0..9, fn n ->
-        Task.async(fn -> get_user_products_by_page(user_id, n, token) end)
+        Task.async(fn -> get_user_products_by_page(nickname, n, token) end)
       end)
 
     tasks
@@ -24,12 +24,12 @@ defmodule Meliex.Resources.Item do
     |> List.flatten()
   end
 
-  def get_user_products_by_page(user_id, page, token) do
+  def get_user_products_by_page(nickname, page, token) do
     params = %{offset: page * @limit, limit: @limit}
 
     {:ok, %{body: %{"results" => results}}} =
       Client.get(
-        "https://api.mercadolibre.com/sites/MLB/search?seller_id=#{user_id}",
+        "https://api.mercadolibre.com/sites/MLB/search?nickname=#{nickname}",
         params,
         token: token
       )
