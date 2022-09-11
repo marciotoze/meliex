@@ -1,11 +1,13 @@
 defmodule Meliex.Resources.User do
   alias Meliex.Client
 
-  def me(token) do
-    Client.get("/users/me", %{}, token: token)
+  @spec me(Client.credential()) :: {:ok, Tesla.Env.t()} | {:error, any()}
+  def me(credential) do
+    Client.get(credential, "/users/me")
   end
 
-  def find(user_id, token) do
-    Client.get("/users/#{user_id}", %{}, token: token)
+  @spec find(Client.credential(), integer) :: {:ok, Tesla.Env.t()} | {:error, any()}
+  def find(credential, user_id) do
+    Client.get(credential, "/users/#{user_id}")
   end
 end

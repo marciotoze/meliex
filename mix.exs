@@ -28,6 +28,7 @@ defmodule Meliex.MixProject do
       {:ex_doc, "~> 0.27", only: :dev, runtime: false},
       {:hackney, "~> 1.18"},
       {:jason, ">= 1.3.0"},
+      {:oauth2, "~> 2.0"},
       {:tesla, "~> 1.4"},
       {:timex, "~> 3.7.6"}
     ]
