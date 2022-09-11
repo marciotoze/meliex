@@ -4,7 +4,7 @@ defmodule Meliex.MixProject do
   def project do
     [
       app: :meliex,
-      version: "0.2.2",
+      version: "1.0.0",
       elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
       description: description(),
